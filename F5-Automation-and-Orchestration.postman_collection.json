@@ -1,0 +1,453 @@
+{
+	"info": {
+		"_postman_id": "9575c194-ed11-4846-aea2-8fe90513da34",
+		"name": "F5-Automation-and-Orchestration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Lab 1.1 - API Authentication",
+			"item": [
+				{
+					"name": "Token Declarative Onboarding",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"admin\",\r\n    \"password\":\"GoodBaklava123!@#\",\r\n    \"loginProviderName\":\"tmos\"\r\n}"
+						},
+						"url": {
+							"raw": "https://{{bigip_DO}}/mgmt/shared/authn/login",
+							"protocol": "https",
+							"host": [
+								"{{bigip_DO}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"authn",
+								"login"
+							]
+						},
+						"description": "Send POST request to BIG-IP DO for token"
+					},
+					"response": []
+				},
+				{
+					"name": "Token - AS3",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"admin\",\r\n    \"password\":\"admin\",\r\n    \"loginProviderName\":\"tmos\"\r\n}"
+						},
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/authn/login",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"authn",
+								"login"
+							]
+						},
+						"description": "send POST request to BIG-IP AS3 for token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lab 2.1 - Declarative Onboarding",
+			"item": [
+				{
+					"name": "Get Declarative Onboarding Version Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_DO_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{bigip_DO}}/mgmt/shared/declarative-onboarding/info",
+							"protocol": "https",
+							"host": [
+								"{{bigip_DO}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"declarative-onboarding",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST DO Declaration to Configure BIG-IP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_DO_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"schemaVersion\": \"1.4.1\",\r\n    \"class\": \"Device\",\r\n    \"async\": true,\r\n    \"Common\": {\r\n        \"class\": \"Tenant\",\r\n        \"hostname\": \"ip-10-1-1-4.us-west-2.compute.internal\",\r\n        \"myLicense\": {\r\n            \"class\": \"License\",\r\n            \"licenseType\": \"regKey\",\r\n            \"regKey\": \"AAAAA-BBBBB-CCCCC-DDDDD-EEEEE\"\r\n        },\r\n        \"myProvisioning\": {\r\n            \"class\": \"Provision\",\r\n            \"ltm\": \"nominal\"\r\n        },\r\n        \"myDns\": {\r\n            \"class\": \"DNS\",\r\n            \"nameServers\": [\r\n                \"8.8.8.8\"\r\n            ],\r\n            \"search\": [\r\n                \"f5.com\"\r\n            ]\r\n        },\r\n        \"myNtp\": {\r\n            \"class\": \"NTP\",\r\n            \"servers\": [\r\n                \"0.pool.ntp.org\",\r\n                \"1.pool.ntp.org\"\r\n            ],\r\n            \"timezone\": \"UTC\"\r\n        },\r\n        \"internal\": {\r\n            \"class\": \"VLAN\",\r\n            \"interfaces\": [\r\n                {\r\n                    \"name\": \"1.1\",\r\n                    \"tagged\": false\r\n                }\r\n            ]\r\n        },\r\n        \"internal-self\": {\r\n            \"class\": \"SelfIp\",\r\n            \"address\": \"10.1.10.99/24\",\r\n            \"vlan\": \"internal\",\r\n            \"allowService\": \"default\",\r\n            \"trafficGroup\": \"traffic-group-local-only\"\r\n        },\r\n        \"external\": {\r\n            \"class\": \"VLAN\",\r\n            \"interfaces\": [\r\n                {\r\n                    \"name\": \"1.2\",\r\n                    \"tagged\": false\r\n                }\r\n            ]\r\n        },\r\n        \"external-self\": {\r\n            \"class\": \"SelfIp\",\r\n            \"address\": \"10.1.20.99/24\",\r\n            \"vlan\": \"external\",\r\n            \"allowService\": \"none\",\r\n            \"trafficGroup\": \"traffic-group-local-only\"\r\n        },\r\n        \"external_default_gateway\": {\r\n            \"class\": \"Route\",\r\n            \"gw\": \"10.1.10.9\",\r\n            \"network\": \"default\",\r\n            \"mtu\": 1500\r\n        }\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "https://{{bigip_DO}}/mgmt/shared/declarative-onboarding/",
+							"protocol": "https",
+							"host": [
+								"{{bigip_DO}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"declarative-onboarding",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lab 3.1 - Application Service Deployments with AS3",
+			"item": [
+				{
+					"name": "Get AS3 Services Version Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_DO_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/appsvcs/info",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"appsvcs",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deploy HTTP_Service",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_AS3_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"persist\": true,\r\n    \r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.13.0\",\r\n        \"controls\": {\r\n            \"trace\": true\r\n        },\r\n        \r\n        \"My_AS3_Tenant\": {\r\n            \"class\": \"Tenant\",\r\n            \r\n            \"My_AS3_App\": {\r\n                \"class\": \"Application\",\r\n                \"template\": \"generic\",\r\n\r\n \r\n\r\n                \"Virtual_Server\": {\r\n                    \"class\": \"Service_Generic\",\r\n                    \"virtualPort\": 80,\r\n                    \"virtualAddresses\": [\r\n                        \"10.1.20.9\"    \r\n                    ],\r\n                    \"pool\": \"http_pool\",\r\n                    \"profileHTTP\": {\"use\": \"http\"}\r\n                },\r\n                \r\n                \"http_pool\": {\r\n                    \"class\": \"Pool\",\r\n                    \"monitors\": [\r\n                        {\r\n                            \"bigip\": \"/Common/http_index\"\r\n                        },\r\n                        {\r\n                            \"bigip\": \"/Common/http_basic\"\r\n                        },\r\n                        {\r\n                            \"bigip\": \"/Common/http_default\"\r\n                        }\r\n                    ],\r\n                    \"members\":[\r\n                        {\r\n                            \"servicePort\": 80,\r\n                            \"serverAddresses\": \r\n                            [\r\n                                \"10.1.10.5\"\r\n                            ]\r\n                        }\r\n                    ]\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/appsvcs/declare",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"appsvcs",
+								"declare"
+							]
+						},
+						"description": "Deploy http application to BIG-IP using AS3 json declaration "
+					},
+					"response": []
+				},
+				{
+					"name": "Get Deployed AS3 Services",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_AS3_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/appsvcs/declare",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"appsvcs",
+								"declare"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST to Delete All Services Under Tenant Class",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_AS3_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"class\": \"AS3\",\r\n    \"action\": \"deploy\",\r\n    \"declaration\": {\r\n        \"class\": \"ADC\",\r\n        \"schemaVersion\": \"3.13.0\",\r\n        \r\n        \"My_AS3_Tenant\": {\r\n            \"class\": \"Tenant\"        \r\n        }\r\n    }\r\n }"
+						},
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/appsvcs/declare",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"appsvcs",
+								"declare"
+							]
+						},
+						"description": "Delete the services for tenant class"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "da1cefd8-e397-4f69-8dd2-bcafdb9ecc98",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "366fbb2b-09c6-4d4f-8c2c-3163629f735f",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Lab 4.1 - Telemetry Streaming",
+			"item": [
+				{
+					"name": "Get Telemetry Streaming Services Version Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_AS3_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/telemetry/info",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"telemetry",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Telemetry Streaming Services Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_AS3_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/telemetry/declare",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"telemetry",
+								"declare"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Telemetry Streaming Services to AWS Cloudwatch ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-F5-Auth-Token",
+								"value": "{{bigip_AS3_auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"class\": \"Telemetry\",\r\n    \"My_System\": {\r\n        \"class\": \"Telemetry_System\",\r\n        \"systemPoller\": {\r\n            \"interval\": 60\r\n        }\r\n    },\r\n    \"My_Listener\": {\r\n        \"class\": \"Telemetry_Listener\",\r\n        \"port\": 6514\r\n    },\r\n    \"My_Consumer\": {\r\n        \"class\": \"Telemetry_Consumer\",\r\n        \"type\": \"AWS_CloudWatch\",\r\n        \"region\": \"<< region of BIG-IP >>\",\r\n        \"logGroup\": \"<< Log Group >>\",\r\n        \"logStream\": \"<< Log Stream >>\",\r\n        \"username\": \"<< AWS Access Key >>\",\r\n        \"passphrase\": {\r\n            \"cipherText\": \"<< AWS Secret Key >>\"\r\n        }\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "https://{{bigip_AS3}}/mgmt/shared/telemetry/declare",
+							"protocol": "https",
+							"host": [
+								"{{bigip_AS3}}"
+							],
+							"path": [
+								"mgmt",
+								"shared",
+								"telemetry",
+								"declare"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
